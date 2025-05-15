@@ -1,26 +1,32 @@
-name: Build Vue.js 3 Project
+name: Deploy to Github Pages
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main  # OU 'develop', dependendo da sua branch principal
 
 jobs:
-  build:
+  deploy:
+    name: Deploy Application
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout do repositório
-      uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v3  # Use sempre a versão estável atual
 
-    - name: 🟢 Instalar Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Use Node.js LTS mais recente
 
-    - name: 📦 Instalar dependências
-      run: npm install
+      - name: Install dependencies and build
+        run: |
+          npm install -g @vue/cli
+          yarn install
+          yarn build
 
-    - name: 🛠️ Fazer build
-      run: npm run build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
